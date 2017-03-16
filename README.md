@@ -1,1 +1,1 @@
-# Banking Data Analised Through ML
+# Banking Data Analysed Through ML
