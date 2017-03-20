@@ -1,6 +1,8 @@
 import tensorflow.contrib as tf
 import numpy as np
 import pandas as pd
+import matplotlib as mp
+import sklearn as sk
 
 BANK_TRAINING = "bank.csv"
 BANK_TEST = "bank_predict.csv"
