@@ -1,6 +1,5 @@
-from random import random as rand
 import plotly
-from plotly.graph_objs import *
+import plotly.graph_objs as go
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -12,18 +11,8 @@ COLUMNS = ["age","job","marital","education","default","balance","housing","loan
 
 df = pd.read_csv(cv_set)
 
-df.info()
-quit()
-
-plt.figure()
-df.plot.pie("y")
-
-
-
-df_yes = df[str(df.y)=='yes']
-df_no = df[str(df.y)=='no']
-
-df.head(2)
+df_yes = df[df.y=='yes']
+df_no = df[df.y=='no']
 
 fig = {
     'data': [
@@ -46,5 +35,17 @@ fig = {
     }
 }
 
-
 plotly.offline.plot(fig)
+
+'''
+yes_t = df_yes.size
+no_t = df_no.size
+fig_pie = {
+    'data': [{'labels': ['Yes', 'No '],
+              'values': [yes_t, no_t],
+              'type': 'pie'}],
+    'layout': {'title': 'How many deposits were issued'}
+     }
+
+plotly.offline.plot(fig_pie)
+'''

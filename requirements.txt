@@ -1,0 +1,5 @@
+matplotlib==2.0.0
+pandas==0.19.2
+tensorflow==1.0.1
+tflearn==0.3
+plotly==2.0.6
