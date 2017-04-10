@@ -4,6 +4,7 @@ import sklearn.neighbors as knn
 import pandas as pd
 from data_encoding import one_hot, label_vec
 from sklearn import svm
+from sklearn import tree
 
 BANK_TRAINING = "bank-training_new.csv"
 BANK_VALIDATION = "bank-crossvalidation_new.csv"
@@ -31,9 +32,10 @@ models = []
 models.append(lm.LogisticRegression())
 models.append(knn.KNeighborsClassifier())
 models.append(svm.SVC(kernel='linear'))
-models.append(svm.SVC(kernel='poly', degree='3'))
-models.append(svm.SVC(kernel='poly', degree='16'))
-models.append(svm.SVC(kernel='rbf', degree='16'))
+models.append(svm.SVC(kernel='poly', degree=3))
+models.append(svm.SVC(kernel='poly', degree=16))
+models.append(svm.SVC(kernel='rbf', degree=16, verbose=True, max_iter=100 ))
+models.append(tree.DecisionTreeClassifier())
 
 f = open(LOG_FILE, 'w+')
 
