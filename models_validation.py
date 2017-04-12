@@ -5,6 +5,9 @@ import pandas as pd
 from data_encoding import one_hot, label_vec
 from sklearn import svm
 from sklearn import tree
+from sklearn import preprocessing
+from sklearn.decomposition import PCA, IncrementalPCA
+
 
 BANK_TRAINING = "bank-training_new.csv"
 BANK_VALIDATION = "bank-crossvalidation_new.csv"
@@ -16,33 +19,91 @@ CATEGORICAL_COLUMNS = ["job","marital","education","default","housing","loan","c
 CONTINUOUS_COLUMNS = ["age","balance","duration","campaign","pdays","previous"]
 LABEL = "y"
 
+min_max_scaler = preprocessing.MinMaxScaler()
+standard_scaler = preprocessing.StandardScaler()
+pca = PCA(n_components=5)
+ipca = IncrementalPCA(n_components=5)
+
+############################
 training_set = pd.read_csv(BANK_TRAINING, names=COLUMNS, skipinitialspace=True, skiprows=1)
 training_label_set = deepcopy(training_set[LABEL])
 del training_set[LABEL]
+#
 training_set = one_hot(training_set, CATEGORICAL_COLUMNS)
 training_label_set = label_vec(training_label_set)
+#
+training_set_mn_scaled = min_max_scaler.fit_transform(training_set)
+training_set_mn_scaled = pd.DataFrame(training_set_mn_scaled)
+#
+training_set_sc_scaled = standard_scaler.fit_transform(training_set)
+training_set_sc_scaled = pd.DataFrame(training_set_sc_scaled)
+#
+training_set_pca_sc_scaled = ipca.fit_transform(deepcopy(training_set_sc_scaled))
 
+##########################
 validation_set = pd.read_csv(BANK_VALIDATION, names=COLUMNS, skipinitialspace=True, skiprows=1)
 validation_label_set = deepcopy(validation_set[LABEL])
 del validation_set[LABEL]
+#
 validation_set = one_hot(validation_set, CATEGORICAL_COLUMNS)
 validation_label_set = label_vec(validation_label_set)
+#
+validation_set_mn_scaled = min_max_scaler.fit_transform(validation_set)
+validation_set_mn_scaled = pd.DataFrame(validation_set_mn_scaled)
+#
+validation_set_sc_scaled = standard_scaler.fit_transform(validation_set)
+validation_set_sc_scaled = pd.DataFrame(validation_set_sc_scaled)
+#
+validation_set_pca_sc_scaled = ipca.fit_transform(deepcopy(validation_set_sc_scaled))
 
-models = []
-models.append(lm.LogisticRegression())
-models.append(knn.KNeighborsClassifier())
-models.append(svm.SVC(kernel='linear'))
-models.append(svm.SVC(kernel='poly', degree=3))
-models.append(svm.SVC(kernel='poly', degree=16))
-models.append(svm.SVC(kernel='rbf', degree=16, verbose=True, max_iter=100 ))
-models.append(tree.DecisionTreeClassifier())
+#####################################################################
+#Array of Tuples of Model,Training Data, Validation Data, Description
+pipelines = []
 
+pipelines.append((lm.LogisticRegression(), training_set, validation_set, "Logistic Regression"))
+pipelines.append((lm.LogisticRegression(), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->Logistic Regression"))
+pipelines.append((lm.LogisticRegression(), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->Logistic Regression"))
+pipelines.append((lm.LogisticRegression(), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->Logistic Regression"))
+
+pipelines.append((knn.KNeighborsClassifier(), training_set, validation_set, "K-Nearest Neighbours"))
+pipelines.append((knn.KNeighborsClassifier(), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->K-Nearest Neighbours"))
+pipelines.append((knn.KNeighborsClassifier(), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->K-Nearest Neighbours"))
+pipelines.append((knn.KNeighborsClassifier(), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->K-Nearest Neighbours"))
+
+pipelines.append((svm.SVC(kernel='linear',  max_iter=1000000), training_set, validation_set, "Linear Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='linear',  max_iter=1000000), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->Linear Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='linear',  max_iter=1000000), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->Linear Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='linear',  max_iter=1000000), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->Linear Support Vector Machine"))
+
+pipelines.append((svm.SVC(kernel='poly', degree=3,  max_iter=1000000), training_set, validation_set, "3Poly Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='poly', degree=3,  max_iter=1000000), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->3Poly Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='poly', degree=3,  max_iter=1000000), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->3Poly Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='poly', degree=3,  max_iter=1000000), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->3Poly Support Vector Machine"))
+
+pipelines.append((svm.SVC(kernel='poly', degree=16,  max_iter=1000000), training_set, validation_set, "16Poly Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='poly', degree=16,  max_iter=1000000), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->16Poly Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='poly', degree=16,  max_iter=1000000), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->16Poly Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='poly', degree=16,  max_iter=1000000), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->16Poly Support Vector Machine"))
+
+pipelines.append((svm.SVC(kernel='rbf', degree=16,  max_iter=1000000), training_set, validation_set, "16RBF Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='rbf', degree=16,  max_iter=1000000), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->16RBF Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='rbf', degree=16,  max_iter=1000000), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->16RBF Support Vector Machine"))
+pipelines.append((svm.SVC(kernel='rbf', degree=16,  max_iter=1000000), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->16RBF Support Vector Machine"))
+
+pipelines.append((tree.DecisionTreeClassifier(), training_set, validation_set, "Decision Tree"))
+pipelines.append((tree.DecisionTreeClassifier(), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->Decision Tree"))
+pipelines.append((tree.DecisionTreeClassifier(), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->Decision Tree"))
+pipelines.append((tree.DecisionTreeClassifier(), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->Decision Tree"))
+
+
+#####################################################################
 f = open(LOG_FILE, 'w+')
 
-for model in models:
-    model.fit(training_set, training_label_set)
-    score = str( model.score(validation_set, validation_label_set) )
-    describe = str(model) + score + "\n\n**********\n\n"
+for pipeline in pipelines:
+    mdl, train, validate, description = pipeline
+    mdl.fit(train, training_label_set)
+    score = str( mdl.score(validate, validation_label_set) )
+    describe = description +"  "+ score + "\n\n**********\n\n"
     f.write(describe)
     print(describe)
 
