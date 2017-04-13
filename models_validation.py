@@ -2,11 +2,16 @@ from copy import deepcopy
 import sklearn.linear_model as lm
 import sklearn.neighbors as knn
 import pandas as pd
-from data_encoding import one_hot, label_vec
+import tflearn
+import numpy as np
+from data_encoding import one_hot, label_vec, binary_vectorizing
 from sklearn import svm
 from sklearn import tree
 from sklearn import preprocessing
 from sklearn.decomposition import PCA, IncrementalPCA
+from sklearn.ensemble import RandomForestClassifier
+import tensorflow.contrib.learn as learn
+#import tflearn as learn
 
 
 BANK_TRAINING = "bank-training_new.csv"
@@ -30,7 +35,7 @@ training_label_set = deepcopy(training_set[LABEL])
 del training_set[LABEL]
 #
 training_set = one_hot(training_set, CATEGORICAL_COLUMNS)
-training_label_set = label_vec(training_label_set)
+training_label_set = binary_vectorizing(training_label_set, ['no', 'yes'])
 #
 training_set_mn_scaled = min_max_scaler.fit_transform(training_set)
 training_set_mn_scaled = pd.DataFrame(training_set_mn_scaled)
@@ -46,7 +51,7 @@ validation_label_set = deepcopy(validation_set[LABEL])
 del validation_set[LABEL]
 #
 validation_set = one_hot(validation_set, CATEGORICAL_COLUMNS)
-validation_label_set = label_vec(validation_label_set)
+validation_label_set = binary_vectorizing(validation_label_set, ['no', 'yes'])
 #
 validation_set_mn_scaled = min_max_scaler.fit_transform(validation_set)
 validation_set_mn_scaled = pd.DataFrame(validation_set_mn_scaled)
@@ -94,6 +99,11 @@ pipelines.append((tree.DecisionTreeClassifier(), training_set, validation_set, "
 pipelines.append((tree.DecisionTreeClassifier(), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->Decision Tree"))
 pipelines.append((tree.DecisionTreeClassifier(), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->Decision Tree"))
 pipelines.append((tree.DecisionTreeClassifier(), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->Decision Tree"))
+
+pipelines.append((RandomForestClassifier(), training_set, validation_set, "Random Forest"))
+pipelines.append((RandomForestClassifier(), training_set_mn_scaled, validation_set_mn_scaled, "MinMax-Scaled->Random Forest"))
+pipelines.append((RandomForestClassifier(), training_set_sc_scaled, validation_set_sc_scaled, "Standard-Scaled->Random Forest"))
+pipelines.append((RandomForestClassifier(), training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "Standard-Scaled->PCA->Random Forest"))
 
 
 #####################################################################

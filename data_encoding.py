@@ -14,6 +14,17 @@ def label_vec(dtf):
     df.replace(to_replace=['no', 'yes'], value=[0,1], inplace=True)
     return  df
 
+def binary_vectorizing(dtf, labels):
+    df = deepcopy(dtf)
+    df.replace(to_replace=labels, value=[0,1], inplace=True)
+    return  df
+
+def ternary_vectorizing(dtf, labels):
+    df = deepcopy(dtf)
+    df.replace(to_replace=labels, value=[1,2,3], inplace=True)
+    return  df
+
+
 def main():
     BANK_VALIDATION = "bank-crossvalidation_new.csv"
 
