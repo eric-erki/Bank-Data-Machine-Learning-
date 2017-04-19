@@ -48,10 +48,11 @@ validation_label_set = binary_vectorizing(validation_label_set, ['no', 'yes'])
 #
 
 fc = [layers.real_valued_column("", dimension=len(training_set.columns))]
-#classifier = learn.LinearClassifier(feature_columns=fc, model_dir="./lc/", n_classes=2)
-#classifier = learn.DNNLinearCombinedClassifier(linear_feature_columns=fc, model_dir="./dlc/", n_classes=2)
-classifier = learn.DNNClassifier(feature_columns=fc, n_classes=2, hidden_units=[1000,300,200])
+classifier_lc = learn.LinearClassifier(feature_columns=fc, model_dir="./lc/", n_classes=2)
+classifier_dlc = learn.DNNLinearCombinedClassifier(linear_feature_columns=fc, model_dir="./dlc/", n_classes=2)
+classifier_dc = learn.DNNClassifier(feature_columns=fc, n_classes=2, hidden_units=[1000,300,200])
 
+classifier_dc
 
 classifier.fit(x=training_set , y=training_label_set , steps=10)
 
