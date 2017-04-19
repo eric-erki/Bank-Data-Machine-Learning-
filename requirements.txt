@@ -1,5 +1,6 @@
 matplotlib==2.0.0
 pandas==0.19.2
 tensorflow==1.0.1
-tflearn==0.3
 plotly==2.0.6
+numpy=1.12.1+mkl
+scikit-learn==0.18.1
