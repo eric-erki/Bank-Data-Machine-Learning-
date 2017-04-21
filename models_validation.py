@@ -34,7 +34,7 @@ del training_set[LABEL]
 
 #
 training_set_imputed = deepcopy(training_set)
-training_set_imputed = training_set_imputed.drop([LABEL, 'marital', 'job', 'contact'], axis=1)
+training_set_imputed = training_set_imputed.drop(['marital', 'job', 'contact'], axis=1)
 training_set_imputed['education'] = ternary_vectorizing(training_set_imputed['education'], ['primary', 'secondary', 'tertiary'])
 training_set_imputed['education'].replace('unknown', np.nan, inplace=True)
 training_set_imputed.fillna(training_set_imputed.mean(), inplace=True)
@@ -66,7 +66,7 @@ del validation_set[LABEL]
 
 #
 validation_set_imputed = deepcopy(validation_set)
-validation_set_imputed = validation_set_imputed.drop([LABEL, 'marital', 'job', 'contact'], axis=1)
+validation_set_imputed = validation_set_imputed.drop(['marital', 'job', 'contact'], axis=1)
 validation_set_imputed['education'] = ternary_vectorizing(validation_set_imputed['education'], ['primary', 'secondary', 'tertiary'])
 validation_set_imputed['education'].replace('unknown', np.nan, inplace=True)
 validation_set_imputed.fillna(validation_set_imputed.mean(), inplace=True)
@@ -187,6 +187,13 @@ classifier_lc_imputed = learn.LinearClassifier(feature_columns=fc_imputed, n_cla
 classifier_dlc_imputed = learn.DNNLinearCombinedClassifier(linear_feature_columns=fc_imputed , n_classes=2)
 classifier_dc_imputed = learn.DNNClassifier(feature_columns=fc_imputed, n_classes=2, hidden_units=[1000,300,200])
 
+
+fc_pca = [layers.real_valued_column("", dimension=len(training_set_pca_sc_scaled.columns))]
+classifier_lc_pca = learn.LinearClassifier(feature_columns=fc_pca, n_classes=2)
+classifier_dlc_pca = learn.DNNLinearCombinedClassifier(linear_feature_columns=fc_pca, n_classes=2)
+classifier_dc_pca = learn.DNNClassifier(feature_columns=fc_pca, n_classes=2, hidden_units=[1000,300,200])
+
+
 pipelines.append((classifier_lc, training_set, validation_set, "* Linear"))
 pipelines.append((classifier_dlc, training_set, validation_set, "* Deep Mixed Linear"))
 pipelines.append((classifier_dc, training_set, validation_set, "* Deep Neural"))
@@ -199,9 +206,9 @@ pipelines.append((classifier_lc, training_set_sc_scaled, validation_set_sc_scale
 pipelines.append((classifier_dlc, training_set_sc_scaled, validation_set_sc_scaled, "* Standard-Scaled->Deep Mixed Linear"))
 pipelines.append((classifier_dc, training_set_sc_scaled, validation_set_sc_scaled, "* Standard-Scaled->Deep Neural"))
 
-pipelines.append((classifier_lc, training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "* Standard-Scaled->PCA->Linear"))
-pipelines.append((classifier_dlc, training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "* Standard-Scaled->PCA->Deep Mixed Linear"))
-pipelines.append((classifier_dc, training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "* Standard-Scaled->PCA->Deep Neural"))
+pipelines.append((classifier_lc_pca, training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "* Standard-Scaled->PCA->Linear"))
+pipelines.append((classifier_dlc_pca, training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "* Standard-Scaled->PCA->Deep Mixed Linear"))
+pipelines.append((classifier_dc_pca, training_set_pca_sc_scaled, validation_set_pca_sc_scaled, "* Standard-Scaled->PCA->Deep Neural"))
 
 ##
 pipelines.append((classifier_lc_imputed, training_set_imputed, validation_set_imputed, "* Imputed->Linear"))
