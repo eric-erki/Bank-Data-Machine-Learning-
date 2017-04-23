@@ -193,6 +193,12 @@ classifier_lc_pca = learn.LinearClassifier(feature_columns=fc_pca, n_classes=2)
 classifier_dlc_pca = learn.DNNLinearCombinedClassifier(linear_feature_columns=fc_pca, n_classes=2)
 classifier_dc_pca = learn.DNNClassifier(feature_columns=fc_pca, n_classes=2, hidden_units=[1000,300,200])
 
+fc_pca_imputed = [layers.real_valued_column("", dimension=len(training_set_pca_sc_scaled_imputed.columns))]
+classifier_lc_pca_imputed = learn.LinearClassifier(feature_columns=fc_pca_imputed, n_classes=2)
+classifier_dlc_pca_imputed = learn.DNNLinearCombinedClassifier(linear_feature_columns=fc_pca_imputed, n_classes=2)
+classifier_dc_pca_imputed = learn.DNNClassifier(feature_columns=fc_pca_imputed, n_classes=2, hidden_units=[1000,300,200])
+
+
 
 pipelines.append((classifier_lc, training_set, validation_set, "* Linear"))
 pipelines.append((classifier_dlc, training_set, validation_set, "* Deep Mixed Linear"))
@@ -223,9 +229,9 @@ pipelines.append((classifier_lc_imputed, training_set_sc_scaled_imputed, validat
 pipelines.append((classifier_dlc_imputed, training_set_sc_scaled_imputed, validation_set_sc_scaled_imputed, "* Imputed->Standard-Scaled->Deep Mixed Linear"))
 pipelines.append((classifier_dc_imputed, training_set_sc_scaled_imputed, validation_set_sc_scaled_imputed, "* Imputed->Standard-Scaled->Deep Neural"))
 
-pipelines.append((classifier_lc_imputed, training_set_pca_sc_scaled_imputed, validation_set_pca_sc_scaled_imputed, "* Imputed->Standard-Scaled->PCA->Linear"))
-pipelines.append((classifier_dlc_imputed, training_set_pca_sc_scaled_imputed, validation_set_pca_sc_scaled_imputed, "* Imputed->Standard-Scaled->PCA->Deep Mixed Linear"))
-pipelines.append((classifier_dc_imputed, training_set_pca_sc_scaled_imputed, validation_set_pca_sc_scaled_imputed, "* Imputed->Standard-Scaled->PCA->Deep Neural"))
+pipelines.append((classifier_lc_pca_imputed, training_set_pca_sc_scaled_imputed, validation_set_pca_sc_scaled_imputed, "* Imputed->Standard-Scaled->PCA->Linear"))
+pipelines.append((classifier_dlc_pca_imputed, training_set_pca_sc_scaled_imputed, validation_set_pca_sc_scaled_imputed, "* Imputed->Standard-Scaled->PCA->Deep Mixed Linear"))
+pipelines.append((classifier_dc_pca_imputed, training_set_pca_sc_scaled_imputed, validation_set_pca_sc_scaled_imputed, "* Imputed->Standard-Scaled->PCA->Deep Neural"))
 
 
 #####################################################################
